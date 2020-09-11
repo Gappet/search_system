@@ -119,12 +119,11 @@ public:
         set<string> CheckedWords;
         vector<string> empty;
 
-        for (auto word : words) {
+        for (auto& word : words) {
             const QueryWord query_word = ParseQueryWord(word);
             if(word_to_document_freqs_.count(query_word.data) && word_to_document_freqs_.at(query_word.data).count(document_id)) {
                 if(query_word.is_minus){
-                    vector<string> empty={};
-
+                    empty={};
                     return tuple(empty,document_status.at(document_id));
 
                 }
@@ -283,7 +282,7 @@ int main() {
 
     cout << "Even ids:"s << endl;
     for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
-       PrintDocument(document);
+        PrintDocument(document);
     }
 
     return 0;
