@@ -83,7 +83,7 @@ public:
         const Query query = ParseQuery(raw_query);
         auto find_documents = FindAllDocuments(query);
         vector<Document> matched_documents;
-        for (Document i : find_documents) {
+        for (Document i : find_documents) {                       // переделать на константную ссылку, и переименовать i на более пожходящее, i обычно используется для индексов
             if (filter(i.id,document_status.at(i.id), i.rating)) {
                 matched_documents.push_back(i);
             }
@@ -117,14 +117,14 @@ public:
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
         const vector<string> words = SplitIntoWordsNoStop(raw_query);
         set<string> CheckedWords;
-        vector<string> empty;
+        vector<string> empty;                                     // нет необходимости в этой структуре
 
-        for (auto& word : words) {
+        for (auto& word : words) {                                // word не меняется, должно быть const
             const QueryWord query_word = ParseQueryWord(word);
             if(word_to_document_freqs_.count(query_word.data) && word_to_document_freqs_.at(query_word.data).count(document_id)) {
                 if(query_word.is_minus){
-                    empty={};
-                    return tuple(empty,document_status.at(document_id));
+                    empty={};                                     // это как бы не нужно
+                    return tuple(empty,document_status.at(document_id));  // можно сразу выдать tuple({}, ...) это будет понятно, что пустой
 
                 }
                 else {
@@ -132,24 +132,24 @@ public:
                 }
             }
         }
-        vector<string> out(CheckedWords.begin(),CheckedWords.end());
-        sort(out.begin(),out.end());
+        vector<string> out(CheckedWords.begin(),CheckedWords.end());  // тут несколько не понятно, не буду ставить в замечания, т.к. не возможности прогнать через тесты, если действительно так должно быть, то так и оставьте, но вектор формирутся из set
+        sort(out.begin(),out.end());                                  // а set уже является отсортированной структурой и поэтому не понятно зачем еще нужна дополнительная сортировка, просто самостоятельно протестируйте, насколько она нужна
         return tuple(out,document_status.at(document_id));
 
     }
 
 
 
-    int GetDocumentCount() {
+    int GetDocumentCount() {                    // ментод должен быть константным
         return document_count_;
     }
 
 private:
     set<string> stop_words_;
     map<string, map<int, double>> word_to_document_freqs_;
-    map<int, int> document_ratings_;
-    map<int,DocumentStatus> document_status;
-    int document_count_=0;
+    map<int, int> document_ratings_;           // заменить два контейнера document_ratings_ и document_status на один. для этого добавить структуру со статусом и рейтингом, и контейнер (map) сделать от этого контейнера
+    map<int,DocumentStatus> document_status;   // и поля должны отличаться от переменных, если принято, что имеют в конце подчеркивание, то и дальше следуйте этому.
+    int document_count_=0;                     // избавиться от данного поля, оно только кеширует размер контейнера, если добавить документ (AddDocument) с уже имеющимся document_id, то будет это поле будет не корректно
 
     bool IsStopWord(const string& word) const {
         return stop_words_.count(word) > 0;
