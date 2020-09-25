@@ -424,8 +424,8 @@ void TestSortingRelevance() {
 	    server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {1, 2,3});
 	    server.AddDocument(3, "ухоженный скворец евгений"s,         DocumentStatus::ACTUAL, {6, 4});
 		const auto documents =server.FindTopDocuments("пушистый ухоженный кот", DocumentStatus::ACTUAL);
-		for(int i =1; i<static_cast<int>(documents.size());++i){
-			ASSERT_HINT(documents[i - 1].relevance - documents[i].relevance > 1e-6
+		for(int i =1; i<static_cast<int>(documents.size());++i){			/// рекомендация, объявить size_t i, тогда не нужно будет приведение типов
+			ASSERT_HINT(documents[i - 1].relevance - documents[i].relevance > 1e-6	/// вместо 1e-6 должна быть константа, подсказка: она уже у вас объявлена в самом начале
 					|| (abs(documents[i - 1].relevance - documents[i].relevance) < 1e-6 && (documents[i - 1].rating >= documents[i].rating)),"Сервер неправильно сортирует документы");
 
 		}
