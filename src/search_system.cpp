@@ -410,7 +410,7 @@ void TestSortingRelevance() {
   const auto documents = server.FindTopDocuments("пушистый ухоженный кот", DocumentStatus::ACTUAL);
   for ( size_t i = 1; i < documents.size(); ++i ) {   /// рекомендация, объявить size_t i, тогда не нужно будет приведение типов
        ASSERT_HINT(documents[i - 1].relevance - documents[i].relevance > EPSILON  /// вместо 1e-6 должна быть константа, подсказка: она уже у вас объявлена в самом начале
-       || (abs(documents[i - 1].relevance - documents[i].relevance) < 1e-6 && (documents[i - 1].rating >= documents[i].rating)), "Сервер неправильно сортирует документы");
+       || (abs(documents[i - 1].relevance - documents[i].relevance) < 1e-6 && (documents[i - 1].rating >= documents[i].rating)), "Сервер неправильно сортирует документы");    /// тут то почему оставили 1e-6?
       }
   }
 }
