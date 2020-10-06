@@ -90,8 +90,8 @@ class SearchServer {
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words)
         : stop_words_(MakeUniqueNonEmptyStrings(stop_words)) {
-      for (const auto& word : stop_words_) {
-          if (!IsValidWord(word)) {
+      for (const auto& word : stop_words_) {  /// постарайтесь заменить этот цикл на контейнерный алгоритм из <algorithm>
+          if (!IsValidWord(word)) {           /// небольшая подсказка IsValidWord будет унарным предикатом
               throw invalid_argument("Стоп слова содержат недопустимые символы");
               }
           }
@@ -99,7 +99,7 @@ class SearchServer {
 
     explicit SearchServer(const string& stop_words_text)
         : SearchServer(SplitIntoWords(stop_words_text)) {
-      for (const auto& word : stop_words_) {
+      for (const auto& word : stop_words_) {    /// повторная проверка уже есть в конструкторе, который вызываете
            if (!IsValidWord(word)) {
               throw invalid_argument("Стоп слова содержат недопустимые символы");
            }
@@ -219,6 +219,8 @@ class SearchServer {
         });
     }
 
+    /// предлагаю переделать этот метод, на сигнатуру: vector<string> SplitIntoWordsNoStop(const string& text) const
+    /// а при не корректных входных данных кидать исключение
     [[nodiscard]] bool SplitIntoWordsNoStop(const string& text, vector<string>& result) const {
         result.clear();
         vector<string> words;
@@ -251,6 +253,8 @@ class SearchServer {
         bool is_stop;
     };
 
+    /// предлагаю переделать этот метод, на сигнатуру: QueryWord ParseQueryWord(string text) const
+    /// а при не корректных входных данных кидать исключение
     [[nodiscard]] bool ParseQueryWord(string text, QueryWord& result) const {
         // Empty result by initializing it with default constructed QueryWord
         result = {};
