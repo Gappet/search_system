@@ -84,26 +84,19 @@ enum class DocumentStatus {
 
 class SearchServer {
  public:
-
     inline static constexpr int INVALID_DOCUMENT_ID = -1;
 
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words)
         : stop_words_(MakeUniqueNonEmptyStrings(stop_words)) {
-      for (const auto& word : stop_words_) {  /// постарайтесь заменить этот цикл на контейнерный алгоритм из <algorithm>
-          if (!IsValidWord(word)) {           /// небольшая подсказка IsValidWord будет унарным предикатом
-              throw invalid_argument("Стоп слова содержат недопустимые символы");
-              }
+
+      if (all_of(stop_words.begin(), stop_words.end(), IsValidWord) == false) {
+          throw invalid_argument("Стоп слова содержат недопустимые символы");
           }
       }
 
     explicit SearchServer(const string& stop_words_text)
         : SearchServer(SplitIntoWords(stop_words_text)) {
-      for (const auto& word : stop_words_) {    /// повторная проверка уже есть в конструкторе, который вызываете
-           if (!IsValidWord(word)) {
-              throw invalid_argument("Стоп слова содержат недопустимые символы");
-           }
-      }
     }
 
     void AddDocument(int document_id, const string& document, DocumentStatus status,
@@ -111,10 +104,7 @@ class SearchServer {
         if ((document_id < 0) || (documents_.count(document_id) > 0)) {
             throw invalid_argument("Некорректный id документа");
         }
-        vector<string> words;
-        if (!SplitIntoWordsNoStop(document, words)) {
-            throw invalid_argument("Документ содержит недопустимые символы");
-        }
+        vector<string> words = SplitIntoWordsNoStop(document);
 
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
@@ -126,10 +116,7 @@ class SearchServer {
 
     template <typename DocumentPredicate>
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-      Query query;
-      if (!ParseQuery(raw_query, query)) {
-          throw invalid_argument("Некорректный запрос");
-          }
+      Query query = ParseQuery(raw_query);
       auto matched_documents = FindAllDocuments(query, document_predicate);
 
       sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
@@ -170,12 +157,7 @@ class SearchServer {
     }
 
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-        // Empty result by initializing it with default constructed tuple
-
-        Query query;
-        if (!ParseQuery(raw_query, query)) {
-            throw invalid_argument("Некорректный запрос");
-        }
+        Query query = ParseQuery(raw_query);
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
@@ -221,19 +203,17 @@ class SearchServer {
 
     /// предлагаю переделать этот метод, на сигнатуру: vector<string> SplitIntoWordsNoStop(const string& text) const
     /// а при не корректных входных данных кидать исключение
-    [[nodiscard]] bool SplitIntoWordsNoStop(const string& text, vector<string>& result) const {
-        result.clear();
+    vector<string> SplitIntoWordsNoStop(const string& text) const {
         vector<string> words;
         for (const string& word : SplitIntoWords(text)) {
             if (!IsValidWord(word)) {
-                return false;
+                throw invalid_argument("Документ содержит недопустимые символы");
             }
             if (!IsStopWord(word)) {
                 words.push_back(word);
             }
         }
-        result.swap(words);
-        return true;
+        return words;
     }
 
     static int ComputeAverageRating(const vector<int>& ratings) {
@@ -255,12 +235,11 @@ class SearchServer {
 
     /// предлагаю переделать этот метод, на сигнатуру: QueryWord ParseQueryWord(string text) const
     /// а при не корректных входных данных кидать исключение
-    [[nodiscard]] bool ParseQueryWord(string text, QueryWord& result) const {
+    QueryWord ParseQueryWord(string text) const {
         // Empty result by initializing it with default constructed QueryWord
-        result = {};
 
         if (text.empty()) {
-            return false;
+            throw invalid_argument("Пустой запрос");
         }
         bool is_minus = false;
         if (text[0] == '-') {
@@ -268,11 +247,10 @@ class SearchServer {
             text = text.substr(1);
         }
         if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
-            return false;
+            throw invalid_argument("Некорректный запрос");
         }
 
-        result = QueryWord{text, is_minus, IsStopWord(text)};
-        return true;
+        return QueryWord{text, is_minus, IsStopWord(text)};
     }
 
     struct Query {
@@ -280,14 +258,11 @@ class SearchServer {
         set<string> minus_words;
     };
 
-    [[nodiscard]] bool ParseQuery(const string& text, Query& result) const {
+    Query ParseQuery(const string& text) const {
         // Empty result by initializing it with default constructed Query
-        result = {};
+        Query result;
         for (const string& word : SplitIntoWords(text)) {
-            QueryWord query_word;
-            if (!ParseQueryWord(word, query_word)) {
-                return false;
-            }
+            QueryWord query_word = ParseQueryWord(word);
             if (!query_word.is_stop) {
                 if (query_word.is_minus) {
                     result.minus_words.insert(query_word.data);
@@ -296,7 +271,7 @@ class SearchServer {
                 }
             }
         }
-        return true;
+        return result;
     }
 
     // Existence required
@@ -390,7 +365,8 @@ void MatchDocuments(const SearchServer& search_server, const string& query) {
 }
 
 int main() {
-    SearchServer search_server("и в на"s);
+    SearchServer search_server("и в на \x12"s);
+    //SearchServer search_server();
     PrintMatchDocumentResult(42, vector<string> {"bla", "blabla", "blablabla"}, DocumentStatus::ACTUAL);
 
     AddDocument(search_server, 1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, {7, 2, 7});
