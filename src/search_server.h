@@ -20,7 +20,7 @@ class SearchServer {
 
   explicit SearchServer(const std::string& stop_words_text);
 
-  template <typename StringContainer>
+  template <typename StringContainer>			/// реализию шаблонов лучше обрать за класс (ниже под классом)
   explicit SearchServer(const StringContainer& stop_words)
       : stop_words_(MakeUniqueNonEmptyStrings(stop_words)) {
     if (!all_of(stop_words_.begin(), stop_words_.end(), IsValidWord)) {
@@ -33,7 +33,7 @@ class SearchServer {
   void AddDocument(int document_id, const std::string& document,
                    DocumentStatus status, const std::vector<int>& ratings);
 
-  template <typename DocumentPredicate>
+  template <typename DocumentPredicate>			/// реализию шаблонов лучше обрать за класс (ниже под классом)
   std::vector<Document> FindTopDocuments(
       const std::string& raw_query,
       DocumentPredicate document_predicate) const {
@@ -104,7 +104,7 @@ class SearchServer {
   // Existence required
   double ComputeWordInverseDocumentFreq(const std::string& word) const;
 
-  template <typename DocumentPredicate>
+  template <typename DocumentPredicate>		/// реализию шаблонов лучше обрать за класс (ниже под классом)
   std::vector<Document> FindAllDocuments(
       const Query& query, DocumentPredicate document_predicate) const {
     std::map<int, double> document_to_relevance;
@@ -141,6 +141,11 @@ class SearchServer {
     return matched_documents;
   }
 };
+
+/// несколько не понятно для чего эти функции,
+/// если для тестирования, то тогда их лучше убрать к тестам,
+/// если нужны как методы не бросающие исключение, то правильней объявить соотвествующие методы, к примеру AddDocumentNoExeption
+/// подозреваяю, что все же для тестирования. В таком виде оставлять это не правильно
 
 void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words,
                               DocumentStatus status);

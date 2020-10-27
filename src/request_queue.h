@@ -11,7 +11,7 @@ public:
   explicit RequestQueue(const SearchServer& search_server)
       : search_server_(search_server) {}
 
-  template <typename DocumentPredicate>
+  template <typename DocumentPredicate>		/// реализию шаблонов лучше обрать за класс (ниже под классом)
   std::vector<Document> AddFindRequest(const std::string& raw_query,
                                        DocumentPredicate document_predicate) {
     IncrementTime();
@@ -26,7 +26,7 @@ public:
     return requests_.front().result_;
   }
 
-  std::vector<Document> AddFindRequest(const std::string& raw_query,
+  std::vector<Document> AddFindRequest(const std::string& raw_query,	/// реализию инлайновых функций так же лучше обрать за класс (ниже под классом)
                                        DocumentStatus status) {
     return AddFindRequest(
         raw_query, [status](int document_id, DocumentStatus document_status,

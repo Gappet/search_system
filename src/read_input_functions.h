@@ -1,4 +1,4 @@
-
+/// добавить защиту от повторного включения
 
 #include <string>
 #include <vector>

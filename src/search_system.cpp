@@ -1,4 +1,4 @@
-#include "paginator.h"
+#include "paginator.h"			/// правильней включать вначале системные заголовочны файлы
 #include "search_server.h"
 #include "request_queue.h"
 #include "document.h"
