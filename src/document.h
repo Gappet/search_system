@@ -1,5 +1,5 @@
-
 #pragma once
+
 #include <iostream>
 struct Document {
   Document() = default;
@@ -10,11 +10,7 @@ struct Document {
   int rating = 0;
 };
 
-
-
 std::ostream& operator<<(std::ostream& out, const Document& document);
-
-void PrintDocument(const Document& document);
 
 enum class DocumentStatus {
   ACTUAL,

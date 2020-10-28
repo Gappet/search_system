@@ -1,4 +1,4 @@
-/// добавить защиту от повторного включения
+#pragma once
 
 #include <string>
 #include <vector>

@@ -16,11 +16,5 @@ std::ostream& operator<<(std::ostream& out, const Document& document) {
   return out;
 }
 
-/// дублирущая функция оператор выше, постарайтесь избавиться от нее
-void PrintDocument(const Document& document) {
-  std::cout << "{ "s
-            << "document_id = "s << document.id << ", "s
-            << "relevance = "s << document.relevance << ", "s
-            << "rating = "s << document.rating << " }"s << std::endl;
-}
+
 
