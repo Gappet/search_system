@@ -1,4 +1,3 @@
-#pragma once
 #include "search_server.h"
 
 void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words,
