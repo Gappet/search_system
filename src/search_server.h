@@ -34,10 +34,17 @@ class SearchServer {
 
   int GetDocumentCount() const;
 
-  int GetDocumentId(int index) const;
+  std::vector<int>::const_iterator begin();
+
+  std::vector<int>::const_iterator end();
 
   std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(
       const std::string& raw_query, int document_id) const;
+
+  const std::map<std::string, double>& GetWordFrequencies(
+      int document_id) const;
+
+  void RemoveDocument(int document_id);
 
  private:
   struct DocumentData {
@@ -48,6 +55,8 @@ class SearchServer {
   std::map<std::string, std::map<int, double>> word_to_document_freqs_;
   std::map<int, DocumentData> documents_;
   std::vector<int> document_ids_;
+  std::map<int, std::map<std::string, double>> words_frequencies_;
+
 
   bool IsStopWord(const std::string& word) const;
 
@@ -96,7 +105,7 @@ std::vector<Document> SearchServer::FindTopDocuments(
 
   sort(matched_documents.begin(), matched_documents.end(),
        [](const Document& lhs, const Document& rhs) {
-         if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
            return lhs.rating > rhs.rating;
          } else {
            return lhs.relevance > rhs.relevance;

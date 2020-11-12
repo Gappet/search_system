@@ -12,5 +12,5 @@ void AddDocument(SearchServer& search_server, int document_id,
 void FindTopDocuments(const SearchServer& search_server,
                       const std::string& raw_query);
 
-void MatchDocuments(const SearchServer& search_server,
+void MatchDocuments(SearchServer& search_server,
                     const std::string& query);
