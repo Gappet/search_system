@@ -27,7 +27,7 @@ void SearchServer::AddDocument(int document_id, const std::string& document,
   words_frequencies_[document_id] = words_frequencies;
   documents_.emplace(document_id,
                      DocumentData{ComputeAverageRating(ratings), status});
-  document_ids_.push_back(document_id);
+  document_ids_.insert(document_id);
 }
 
 std::vector<Document> SearchServer::FindTopDocuments(
@@ -45,11 +45,12 @@ std::vector<Document> SearchServer::FindTopDocuments(
 
 int SearchServer::GetDocumentCount() const { return documents_.size(); }
 
-std::vector<int>::const_iterator SearchServer::begin() {
+std::set<int>::const_iterator SearchServer::begin() {
   return document_ids_.begin();
 }
+
 //
-std::vector<int>::const_iterator SearchServer::end() {
+std::set<int>::const_iterator SearchServer::end() {
   return document_ids_.end();
 }
 
@@ -162,14 +163,13 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(
   return empty_;
 }
 
-/// у метода сложность скорее всего не будет как в требовании задания O(M * log(N))
-/// потому что используется вектор, у вектора сложность операции поиска = O(N)
+
 void SearchServer::RemoveDocument(int document_id) {
   std::map<std::string, double> delete_doc;
   if (words_frequencies_.count(document_id)) {
     delete_doc = words_frequencies_[document_id];
     words_frequencies_.erase(document_id);
-    for (auto it : delete_doc) {			/// не нужное копирование, обязательно использовать константную ссылку
+    for (const auto& it : delete_doc) {
       if (word_to_document_freqs_.count(it.first) &&
           word_to_document_freqs_.at(it.first).count(document_id)) {
         word_to_document_freqs_.at(it.first).erase(document_id);
