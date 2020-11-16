@@ -16,7 +16,7 @@ void RemoveDuplicates(SearchServer& search_server) {
 
     auto doc_id =
         std::find_if(next(it, 1), search_server.end(),
-                     [doc_words, search_server](auto left) {
+                     [doc_words, search_server](auto left) {			/// при захвате "по-значению" происходит копирование, правильней использовать ссылки
                        const std::map<std::string, double> comp_doc_word =
                            search_server.GetWordFrequencies(left);
                        return doc_words.size() == comp_doc_word.size() &&
