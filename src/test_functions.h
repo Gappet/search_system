@@ -2,7 +2,8 @@
 
 #include "search_server.h"
 
-void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words,
+void PrintMatchDocumentResult(int document_id,
+                              const std::vector<std::string_view> words,
                               DocumentStatus status);
 
 void AddDocument(SearchServer& search_server, int document_id,
@@ -12,5 +13,4 @@ void AddDocument(SearchServer& search_server, int document_id,
 void FindTopDocuments(const SearchServer& search_server,
                       const std::string& raw_query);
 
-void MatchDocuments(SearchServer& search_server,
-                    const std::string& query);
+void MatchDocuments(SearchServer& search_server, const std::string& query);

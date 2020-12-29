@@ -5,26 +5,27 @@
 #include <map>
 #include <set>
 #include <string>
+#include <string_view>
 
 using namespace std::string_literals;
 
 void RemoveDuplicates(SearchServer& search_server) {
   std::set<int> dublicates_docs;
 
-    std::set<std::set<std::string>> cash;
-    for (auto it = search_server.begin(); it != search_server.end(); ++it) {
-      const std::map<std::string, double> doc_words =
-          search_server.GetWordFrequencies(*it);
-      std::set<std::string> words;
-      for (const auto& [key, _] : doc_words) {
-        words.insert(key);
-      }
-      if (cash.count(words)) {
-        dublicates_docs.insert(*it);
-      } else {
-        cash.insert(words);
-      }
+  std::set<std::set<std::string_view>> cash;
+  for (auto it = search_server.begin(); it != search_server.end(); ++it) {
+    const std::map<std::string_view, double> doc_words =
+        search_server.GetWordFrequencies(*it);
+    std::set<std::string_view> words;
+    for (const auto [key, _] : doc_words) {
+      words.insert(key);
     }
+    if (cash.count(words)) {
+      dublicates_docs.insert(*it);
+    } else {
+      cash.insert(words);
+    }
+  }
 
   for (int i : dublicates_docs) {
     std::cout << "Found duplicate document id "s << i << std::endl;

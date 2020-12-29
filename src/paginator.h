@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 
-
 template <typename Iterator>
 class IteratorRange {
  public:
@@ -20,8 +19,6 @@ class IteratorRange {
   Iterator first_, last_;
   size_t size_;
 };
-
-
 
 template <typename Iterator>
 class Paginator {
@@ -53,9 +50,10 @@ auto Paginate(const Container& c, size_t page_size) {
 }
 
 template <typename Iterator>
-std::ostream& operator<<(std::ostream& out, const IteratorRange<Iterator>& range) {
-    for (Iterator it = range.begin(); it != range.end(); ++it) {
-        out << *it;
-    }
-    return out;
+std::ostream& operator<<(std::ostream& out,
+                         const IteratorRange<Iterator>& range) {
+  for (Iterator it = range.begin(); it != range.end(); ++it) {
+    out << *it;
+  }
+  return out;
 }

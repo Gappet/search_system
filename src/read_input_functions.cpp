@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "read_input_functions.h"
+
+#include <iostream>
 
 std::string ReadLine() {
   std::string s;
@@ -14,5 +14,3 @@ int ReadLineWithNumber() {
   ReadLine();
   return result;
 }
-
-
