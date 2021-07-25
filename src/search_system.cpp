@@ -16,38 +16,28 @@ void PrintDocument(const Document& document) {
 }
 
 int main() {
-  SearchServer search_server("and with"s);
+  cout << "Enter stop words"s << endl;
+  string stop_words = ReadLine();
+
+  SearchServer search_server(stop_words);
   int id = 0;
-  search_server.AddDocument(++id, "white cat and yellow hat"s,
-                            DocumentStatus::ACTUAL, {1, 2});
-  search_server.AddDocument(++id, "curly cat curly tail"s,
-                            DocumentStatus::ACTUAL, {1, 2});
-  search_server.AddDocument(++id, "nasty dog with big eyes"s,
-                            DocumentStatus::ACTUAL, {1, 2});
-  search_server.AddDocument(++id, "nasty pigeon john"s, DocumentStatus::ACTUAL,
-                            {1, 2});
 
-  cout << "ACTUAL by default:"s << endl;
-  // последовательная версия
-  for (const Document& document :
-       search_server.FindTopDocuments("curly nasty cat"s)) {
-    PrintDocument(document);
-  }
-  cout << "BANNED:"s << endl;
-  // последовательная версия
-  for (const Document& document : search_server.FindTopDocuments(
-           execution::seq, "curly nasty cat"s, DocumentStatus::BANNED)) {
-    PrintDocument(document);
+  cout << "Enter quantity of docs"s << endl;
+  int quantity = ReadLineWithNumber();
+
+  for (int i = 0; i < quantity; ++i) {
+    search_server.AddDocument(++id, ReadLine(), DocumentStatus::ACTUAL, {1, 2});
   }
 
-  cout << "Even ids:"s << endl;
-  // параллельная версия
-  for (const Document &document : search_server.FindTopDocuments(
-           execution::par, "curly nasty cat"s,
-           [](int document_id, DocumentStatus status, int rating) {
-             return document_id % 2 == 0;
-           })) {
-    PrintDocument(document);
+  cout << "Quantity of query"s << endl;
+  quantity = ReadLineWithNumber();
+  string query;
+
+  for (int i = 0; i < quantity; ++i) {
+    for (const Document& document :
+         search_server.FindTopDocuments(ReadLine())) {
+      PrintDocument(document);
+    }
   }
 
   return 0;
