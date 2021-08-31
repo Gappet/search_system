@@ -1,4 +1,4 @@
 /Debug
-*.settings
+/.settings
 *.cproject
 *.project
